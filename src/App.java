@@ -23,7 +23,7 @@ public class App {
     static int totalPerdidos = 0;
     static int totalChegadas = 0;
     static int maxQueueSize = 5;    // Capacidade máxima ajustada para 5
-    static int servers = 2;         // Número de servidores    G/G/1/5 = 1    G/G/2/5 = 2
+    static int servers = 2;         // Número de servidores G/G/1/5 = 1    G/G/2/5 = 2
     static int numeroCliente = 0;
     static double[] estadoTempo = new double[maxQueueSize + 1]; // Array para armazenar o tempo acumulado em cada estado
 
@@ -68,13 +68,27 @@ public class App {
             estadoTempo[estadoAtual] += currentTime - ultimoTempoDeMudanca;
             ultimoTempoDeMudanca = currentTime;
 
-            if (!queue.isEmpty() && queue.peek().tempoDeSaida <= currentTime) {
-                estadoAtual = Math.max(0, estadoAtual - 1);
-                departure();
+            if (servers == 1) {
+                if (!queue.isEmpty() && queue.peek().tempoDeSaida <= currentTime) {
+                    estadoAtual = Math.max(0, estadoAtual - 1);
+                    departure();
+                } else {
+                    estadoAtual = Math.min(maxQueueSize, estadoAtual + 1);
+                    currentTime += generateTime(2, 5);
+                    arrival();
+                }
+            } else if (servers == 2) {
+                if (!queue.isEmpty()) {
+                    estadoAtual = Math.max(0, estadoAtual - 1);
+                    departure();
+                } else {
+                    estadoAtual = Math.min(maxQueueSize, estadoAtual + 1);
+                    currentTime += generateTime(2, 5);
+                    arrival();
+                }
             } else {
-                estadoAtual = Math.min(maxQueueSize, estadoAtual + 1);
-                currentTime += generateTime(2, 5);
-                arrival();
+                System.out.println("Número de servidores inválido.");
+                break;
             }
         }
 
