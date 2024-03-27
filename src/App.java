@@ -1,9 +1,31 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class App {
-    // Parâmetros do gerador de números pseudoaleatórios
+    static class Cliente {
+        int numero;
+        double tempoDeSaida;
+
+        Cliente(int numero, double tempoDeSaida) {
+            this.numero = numero;
+            this.tempoDeSaida = tempoDeSaida;
+        }
+    }
+
+    // Parâmetros do simulador
     static int a = 1664525;
     static int c = 1013904223;
     static int M = (int) Math.pow(2, 32);
-    static int previous = 0; // Semente inicial
+    static int previous = 0;
+    static double currentTime = 0.0;
+    static double endTime = 100000;
+    static Queue<Cliente> queue = new LinkedList<>();
+    static int totalPerdidos = 0;
+    static int totalChegadas = 0;
+    static int maxQueueSize = 5;    // Capacidade máxima ajustada para 5
+    static int servers = 2;         // Número de servidores    G/G/1/5 = 1    G/G/2/5 = 2
+    static int numeroCliente = 0;
+    static double[] estadoTempo = new double[maxQueueSize + 1]; // Array para armazenar o tempo acumulado em cada estado
 
     // Função para gerar números pseudoaleatórios entre 0 e 1
     public static double nextRandom() {
@@ -11,49 +33,65 @@ public class App {
         return (double) previous / M;
     }
 
-    // Função para simular chegada de cliente
-    public static void chegada() {
-        // Lógica para tratamento da chegada
-        System.out.println("Cliente chegou.");
+    // Gera um tempo aleatório dentro do intervalo especificado
+    public static double generateTime(double min, double max) {
+        return min + (max - min) * nextRandom();
     }
 
-    // Função para simular saída de cliente
-    public static void saida() {
-        // Lógica para tratamento da saída
-        System.out.println("Cliente saiu.");
+    // Simula a chegada de um cliente
+    public static void arrival() {
+        if (queue.size() < maxQueueSize) {
+            totalChegadas++;
+            numeroCliente++;
+            double tempoDeSaida = currentTime + generateTime(3, 5);
+            queue.add(new Cliente(numeroCliente, tempoDeSaida));
+            System.out.println("Cliente " + numeroCliente + " chegou no tempo: " + currentTime);
+        } else {
+            totalPerdidos++;
+            System.out.println("Cliente perdido no tempo: " + currentTime);
+        }
+    }
+
+    // Simula a saída de um cliente
+    public static void departure() {
+        if (!queue.isEmpty()) {
+            Cliente cliente = queue.poll();
+            System.out.println("Cliente " + cliente.numero + " saiu no tempo: " + currentTime);
+        }
     }
 
     public static void main(String[] args) {
-        int count = 1000; // Quantidade de eventos a simular
+        int estadoAtual = 0;
+        double ultimoTempoDeMudanca = 0.0;
 
-        // Loop principal da simulação
-        while (count > 0) {
-            // Gerar próximo evento
-            double random = nextRandom();
-            int evento = random < 0.5 ? 0 : 1; // 0 para chegada, 1 para saída
+        while (currentTime < endTime) {
+            estadoTempo[estadoAtual] += currentTime - ultimoTempoDeMudanca;
+            ultimoTempoDeMudanca = currentTime;
 
-            // Tratar evento
-            if (evento == 0) {
-                chegada();
+            if (!queue.isEmpty() && queue.peek().tempoDeSaida <= currentTime) {
+                estadoAtual = Math.max(0, estadoAtual - 1);
+                departure();
             } else {
-                saida();
+                estadoAtual = Math.min(maxQueueSize, estadoAtual + 1);
+                currentTime += generateTime(2, 5);
+                arrival();
             }
-
-            count--;
         }
 
-        // Cálculo de tempos acumulados e probabilidades
-        // Aqui você pode implementar a lógica para calcular tempos acumulados e probabilidades
+        estadoTempo[estadoAtual] += currentTime - ultimoTempoDeMudanca;
 
-        // Análise e interpretação dos resultados
-        // Aqui você pode realizar a análise e interpretação dos resultados obtidos
-
-        /*
-        Este é um exemplo básico e simplificado de um simulador de fila em Java. Ele inclui a implementação do gerador de números 
-        pseudoaleatórios usando o Método Congruente Linear e o loop principal da simulação, onde os eventos de chegada e saída são tratados.
-        Note que as funções chegada() e saida() podem ser expandidas para incluir lógica mais detalhada, como a adição e remoção de clientes da fila.
-        A parte final do código, referente ao cálculo de tempos acumulados, probabilidades, análise e interpretação dos resultados, 
-        precisa ser implementada de acordo com as necessidades específicas do simulador e os índices de desempenho desejados.
-        */
+        // Cálculo e impressão da distribuição de probabilidades
+        System.out.println("Distribuicao de probabilidades:");
+        for (int i = 0; i < estadoTempo.length; i++) {
+            double probabilidade = estadoTempo[i] / currentTime;
+            System.out.println("Estado " + i + ": " + probabilidade);     /*Estado 0 = Fila Vazia
+                                                                            Estado 1 = 1 Cliente 
+                                                                            Estado 2 = 2 Clientes
+                                                                            Estado 3 = 3 Clientes
+                                                                            Estado 4 = 4 Clientes
+                                                                            Estado 5 = Fila cheia */
+        }
+        System.out.println("Numero de chegadas: " + totalChegadas);
+        System.out.println("Total de clientes perdidos: " + totalPerdidos);
     }
 }
