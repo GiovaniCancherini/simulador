@@ -1,73 +1,9 @@
-import java.util.PriorityQueue;
-
 public class Simulacao {
     private static double prev = 0.5;
 
-    private static class Planejador {
-        private PriorityQueue<Event> eventQueue;
-
-        public Planejador() {
-            this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.getTempo(), e2.getTempo()));
-        }
-
-        public Event nextEvent() {
-            return eventQueue.poll();
-        }
-        
-        public void addEvent(Event event) {
-            eventQueue.offer(event);
-        }
-    }
-
-    private static class Queue {
-        private int state;
-        private int cap;
-        private int maxServ;
-        private int minServ;
-        private int maxArr;
-        private int minArr;
-        private int loss;
-        private int serv;
-        private double[] times;
-
-        public Queue(int cap, int serv, int maxArr, int minArr, int maxServ, int minServ) {
-            this.state = 0;
-            this.cap = cap;
-            this.maxServ = maxServ;
-            this.minServ = minServ;
-            this.maxArr = maxArr;
-            this.minArr = minArr;
-            this.loss = 0;
-            this.serv = serv;
-            this.times = new double[cap + 1];
-
-        }
-    }
- 
     public static double Next_rand() {
         prev = ((51749 * prev) + 28111) % 1299827;
         return (double) prev / 1299827;
-    }
-
-    private static class Event {
-        public static final int ARRIVAL = 0;
-        public static final int DEPARTURE = 1;
-
-        private int tipo;
-        private double tempo;
-
-        public Event(int tipo, double tempo) {
-            this.tipo = tipo;
-            this.tempo = tempo;
-        }
-        
-        public double getTempo() {
-            return tempo;
-        }
-        
-        public int getTipo() {
-            return tipo;
-        }
     }
 
     public static double[] Arrival(Event event, Queue queue, Planejador planner, double TG,int count) {
