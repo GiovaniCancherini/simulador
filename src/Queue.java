@@ -28,4 +28,7 @@ public class Queue {
     public void loss() { loss++; }
     public void in() { state++; }
     public void out() { state--; }
+    public void accumulateTime(Event event, double TG) { 
+        this.times[this.getState()] += event.getTime() - TG;
+    }
 }

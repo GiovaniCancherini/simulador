@@ -7,9 +7,8 @@ public class Simulacao {
     }
 
     public static double[] Arrival(Event event, Queue queue, Scheduler schedule, double TG, int count) {
-        queue.times[queue.getState()] += event.getTime() - TG;
+        queue.accumulateTime(event, TG);
         TG = event.getTime();
-
         if (queue.getState() < queue.getCapacity()) {
             queue.in();
             if (queue.getState() <= queue.getServers()) {
@@ -19,23 +18,20 @@ public class Simulacao {
         } else {
             queue.loss();
         }
-            
         schedule.addEvent(new Event(0, TG + (queue.minArr + (queue.maxArr - queue.minArr) * Next_rand())));
         double[] result = {count,TG};
         return result;
     }
 
     public static double[] Departure(Event event, Queue queue, Scheduler schedule, double TG, int count) {
-        queue.times[queue.getState()] += event.getTime() - TG;
+        queue.accumulateTime(event, TG);
         TG = event.getTime();
-
         queue.out();
         if (queue.getState() >= queue.getServers()) {
             schedule.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
             count++;
         }
         double[] result = {count,TG};
-
         return result;
     }
 
