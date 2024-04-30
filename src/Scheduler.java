@@ -1,9 +1,9 @@
 import java.util.PriorityQueue;
 
-public class Planejador {
+public class Scheduler {
     private PriorityQueue<Event> eventQueue;
 
-    public Planejador() {
+    public Scheduler() {
         this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.getTime(), e2.getTime()));
     }
 

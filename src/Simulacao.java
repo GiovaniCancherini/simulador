@@ -6,32 +6,32 @@ public class Simulacao {
         return (double) prev / 1299827;
     }
 
-    public static double[] Arrival(Event event, Queue queue, Planejador planner, double TG,int count) {
+    public static double[] Arrival(Event event, Queue queue, Scheduler schedule, double TG, int count) {
         queue.times[queue.getState()] += event.getTime() - TG;
         TG = event.getTime();
 
         if (queue.getState() < queue.getCapacity()) {
             queue.in();
             if (queue.getState() <= queue.getServers()) {
-                planner.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
+                schedule.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
                 count++;
             }
         } else {
             queue.loss();
         }
             
-        planner.addEvent(new Event(0, TG + (queue.minArr + (queue.maxArr - queue.minArr) * Next_rand())));
+        schedule.addEvent(new Event(0, TG + (queue.minArr + (queue.maxArr - queue.minArr) * Next_rand())));
         double[] result = {count,TG};
         return result;
     }
 
-    public static double[] Departure(Event event, Queue queue, Planejador planner, double TG,int count) {
+    public static double[] Departure(Event event, Queue queue, Scheduler schedule, double TG, int count) {
         queue.times[queue.getState()] += event.getTime() - TG;
         TG = event.getTime();
 
         queue.out();
         if (queue.getState() >= queue.getServers()) {
-            planner.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
+            schedule.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
             count++;
         }
         double[] result = {count,TG};
@@ -40,22 +40,22 @@ public class Simulacao {
     }
 
     public static void RunSim(Queue queue) {
-        Planejador planner = new Planejador();
+        Scheduler schedule = new Scheduler();
         double TG = 0;
 
         Event event1 = new Event(0, 2);
-        planner.addEvent(event1);
+        schedule.addEvent(event1);
 
         int count = 0;
         while (count < 100000) {
-            Event nextEvent = planner.nextEvent();
+            Event nextEvent = schedule.nextEvent();
             
             if (nextEvent.getType() == Event.ARRIVAL) {
-                double[] result = Arrival(nextEvent, queue, planner, TG, count);    
+                double[] result = Arrival(nextEvent, queue, schedule, TG, count);    
                 count = (int)result[0];
                 TG = result[1];
             } else if (nextEvent.getType() == Event.DEPARTURE) {
-                double[] result = Departure(nextEvent, queue, planner, TG, count);
+                double[] result = Departure(nextEvent, queue, schedule, TG, count);
                 count = (int)result[0];
                 TG = result[1];
             }
