@@ -20,4 +20,12 @@ public class Queue {
         this.serv = serv;
         this.times = new double[cap + 1];
     }
+
+    public int getState() { return state; }
+    public int getCapacity() { return cap; }
+    public int getServers() { return serv; }
+    public int getLoss() { return loss; }
+    public void loss() { loss++; }
+    public void in() { state++; }
+    public void out() { state--; }
 }

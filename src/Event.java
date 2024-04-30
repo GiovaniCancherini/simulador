@@ -2,19 +2,19 @@ public class Event {
     public static final int ARRIVAL = 0;
     public static final int DEPARTURE = 1;
 
-    private int tipo;
-    private double tempo;
+    private int type;
+    private double time;
 
-    public Event(int tipo, double tempo) {
-        this.tipo = tipo;
-        this.tempo = tempo;
+    public Event(int type, double time) {
+        this.type = type;
+        this.time = time;
     }
     
-    public double getTempo() {
-        return tempo;
+    public double getTime() {
+        return time;
     }
     
-    public int getTipo() {
-        return tipo;
+    public int getType() {
+        return type;
     }
 }

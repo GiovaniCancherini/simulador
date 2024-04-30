@@ -7,17 +7,17 @@ public class Simulacao {
     }
 
     public static double[] Arrival(Event event, Queue queue, Planejador planner, double TG,int count) {
-        queue.times[queue.state] += event.getTempo() - TG;
-        TG = event.getTempo();
+        queue.times[queue.getState()] += event.getTime() - TG;
+        TG = event.getTime();
 
-        if (queue.state < queue.cap) {
-            queue.state++;
-            if (queue.state <= queue.serv) {
+        if (queue.getState() < queue.getCapacity()) {
+            queue.in();
+            if (queue.getState() <= queue.getServers()) {
                 planner.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
                 count++;
             }
         } else {
-            queue.loss++;
+            queue.loss();
         }
             
         planner.addEvent(new Event(0, TG + (queue.minArr + (queue.maxArr - queue.minArr) * Next_rand())));
@@ -26,11 +26,11 @@ public class Simulacao {
     }
 
     public static double[] Departure(Event event, Queue queue, Planejador planner, double TG,int count) {
-        queue.times[queue.state] += event.getTempo() - TG;
-        TG = event.getTempo();
+        queue.times[queue.getState()] += event.getTime() - TG;
+        TG = event.getTime();
 
-        queue.state--;
-        if (queue.state >= queue.serv) {
+        queue.out();
+        if (queue.getState() >= queue.getServers()) {
             planner.addEvent(new Event(1, TG + (queue.minServ + (queue.maxServ - queue.minServ) * Next_rand())));
             count++;
         }
@@ -50,18 +50,18 @@ public class Simulacao {
         while (count < 100000) {
             Event nextEvent = planner.nextEvent();
             
-            if (nextEvent.getTipo() == Event.ARRIVAL) {
+            if (nextEvent.getType() == Event.ARRIVAL) {
                 double[] result = Arrival(nextEvent, queue, planner, TG, count);    
                 count = (int)result[0];
                 TG = result[1];
-            } else if (nextEvent.getTipo() == Event.DEPARTURE) {
+            } else if (nextEvent.getType() == Event.DEPARTURE) {
                 double[] result = Departure(nextEvent, queue, planner, TG, count);
                 count = (int)result[0];
                 TG = result[1];
             }
         }
 
-        System.out.printf("\nFila G/G/%d/%d", queue.serv, queue.cap);
+        System.out.printf("\nFila G/G/%d/%d", queue.serv, queue.getCapacity());
         System.out.println("\nEstado\t\tTempo\t\tProbabilidade(%)");
 
         for (int i = 0; i < queue.times.length; i++) {
@@ -73,7 +73,7 @@ public class Simulacao {
             System.out.print(output);
         }
 
-        System.out.println("\nPerdas: " + queue.loss);
+        System.out.println("\nPerdas: " + queue.getLoss());
         System.out.println("Tempo Global: " + TG);
         System.out.println("\n");
     }

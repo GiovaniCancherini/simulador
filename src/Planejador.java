@@ -4,7 +4,7 @@ public class Planejador {
     private PriorityQueue<Event> eventQueue;
 
     public Planejador() {
-        this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.getTempo(), e2.getTempo()));
+        this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.getTime(), e2.getTime()));
     }
 
     public Event nextEvent() {
