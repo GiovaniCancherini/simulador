@@ -4,14 +4,14 @@ public class Scheduler {
     private PriorityQueue<Event> eventQueue;
 
     public Scheduler() {
-        this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.getTime(), e2.getTime()));
+        this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.GetTime(), e2.GetTime()));
     }
 
-    public Event nextEvent() {
+    public Event NextEvent() {
         return eventQueue.poll();
     }
     
-    public void addEvent(Event event) {
+    public void AddEvent(Event event) {
         eventQueue.offer(event);
     }
 }

@@ -21,14 +21,14 @@ public class Queue {
         this.times = new double[cap + 1];
     }
 
-    public int getState() { return state; }
-    public int getCapacity() { return cap; }
-    public int getServers() { return serv; }
-    public int getLoss() { return loss; }
-    public void loss() { loss++; }
-    public void in() { state++; }
-    public void out() { state--; }
-    public void accumulateTime(Event event, double TG) { 
-        this.times[this.getState()] += event.getTime() - TG;
+    public int GetState() { return state; }
+    public int GetCapacity() { return cap; }
+    public int GetServers() { return serv; }
+    public int GetLoss() { return loss; }
+    public void Loss() { loss++; }
+    public void In() { state++; }
+    public void Out() { state--; }
+    public void AccumulateTime(Event event, double TG) { 
+        this.times[this.GetState()] += event.GetTime() - TG;
     }
 }

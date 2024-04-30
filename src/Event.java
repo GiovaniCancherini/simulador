@@ -10,11 +10,11 @@ public class Event {
         this.time = time;
     }
     
-    public double getTime() {
+    public double GetTime() {
         return time;
     }
     
-    public int getType() {
+    public int GetType() {
         return type;
     }
 }
