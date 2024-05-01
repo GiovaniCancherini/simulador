@@ -1,17 +1,20 @@
 import java.util.PriorityQueue;
 
 public class Scheduler {
-    private PriorityQueue<Event> eventQueue;
+    public static double globalTime = 0;
+    public static PriorityQueue<Event> eventQueue = new PriorityQueue<>();
 
-    public Scheduler() {
-        this.eventQueue = new PriorityQueue<>((e1, e2) -> Double.compare(e1.GetTime(), e2.GetTime()));
+    public static void scheduleEvent(Event event) {
+        eventQueue.add(event);
     }
 
-    public Event NextEvent() {
-        return eventQueue.poll();
+    public static Event nextEvent() {
+        Event event = eventQueue.poll();
+        globalTime = event.getTime();
+        return event;
     }
-    
-    public void AddEvent(Event event) {
-        eventQueue.offer(event);
+
+    public static double getGlobalTime() {
+        return globalTime;
     }
 }

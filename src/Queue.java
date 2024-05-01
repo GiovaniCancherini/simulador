@@ -1,34 +1,73 @@
-public class Queue {
-    int state;
-    int cap;
-    int maxServ;
-    int minServ;
-    int maxArr;
-    int minArr;
-    int loss;
-    int serv;
-    double[] times;
+import java.util.Random;
 
-    public Queue(int cap, int serv, int maxArr, int minArr, int maxServ, int minServ) {
+public class Queue {
+    public String name;
+    public int capacity;
+    public int numServers;
+    public double minServiceTime;
+    public double maxServiceTime;
+    public double arrivalRate;
+    public int state;
+    public int loss;
+    public double[] times;
+    public Random random;
+
+    public Queue(String name, int capacity, int numServers, double minServiceTime, double maxServiceTime, double arrivalRate) {
+        this.name = name;
+        this.capacity = capacity;
+        this.numServers = numServers;
+        this.minServiceTime = minServiceTime;
+        this.maxServiceTime = maxServiceTime;
+        this.arrivalRate = arrivalRate;
         this.state = 0;
-        this.cap = cap;
-        this.maxServ = maxServ;
-        this.minServ = minServ;
-        this.maxArr = maxArr;
-        this.minArr = minArr;
         this.loss = 0;
-        this.serv = serv;
-        this.times = new double[cap + 1];
+        this.times = new double[capacity + 1];
+        this.random = new Random();
     }
 
-    public int GetState() { return state; }
-    public int GetCapacity() { return cap; }
-    public int GetServers() { return serv; }
-    public int GetLoss() { return loss; }
-    public void Loss() { loss++; }
-    public void In() { state++; }
-    public void Out() { state--; }
-    public void AccumulateTime(Event event, double TG) { 
-        this.times[this.GetState()] += event.GetTime() - TG;
+    public void processArrival(double time) {
+        accumulateTime(time);
+        if (state < capacity) {
+            state++;
+            if (state <= numServers) {
+                double serviceTime = minServiceTime + (maxServiceTime - minServiceTime) * random.nextDouble();
+                double departureTime = time + serviceTime;
+                Event departureEvent = new Event(Event.DEPARTURE, name, departureTime);
+                Scheduler.scheduleEvent(departureEvent);
+            }
+        } else {
+            loss++;
+        }
+        double interArrivalTime = -Math.log(random.nextDouble()) / arrivalRate;
+        double nextArrivalTime = time + interArrivalTime;
+        Event arrivalEvent = new Event(Event.ARRIVAL, name, nextArrivalTime);
+        Scheduler.scheduleEvent(arrivalEvent);
+    }
+
+    public void processDeparture(double time) {
+        accumulateTime(time);
+        state--;
+        if (state >= numServers) {
+            double serviceTime = minServiceTime + (maxServiceTime - minServiceTime) * random.nextDouble();
+            double departureTime = time + serviceTime;
+            Event departureEvent = new Event(Event.DEPARTURE, name, departureTime);
+            Scheduler.scheduleEvent(departureEvent);
+        }
+    }
+
+    public void accumulateTime(double time) {
+        times[state] += time - Scheduler.getGlobalTime();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double[] getTimes() {
+        return times;
+    }
+
+    public int getLoss() {
+        return loss;
     }
 }
